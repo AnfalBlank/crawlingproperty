@@ -26,6 +26,7 @@ import { ComparisonPanel } from "@/components/analysis/comparison-panel";
 import { ExportButton } from "@/components/analysis/export-button";
 import { CrawlLoader } from "@/components/analysis/crawl-loader";
 import { FairPriceCalculator } from "@/components/analysis/fair-price-calculator";
+import { ROICalculator } from "@/components/analysis/roi-calculator";
 import { PriceHistoryChart } from "@/components/analysis/price-history-chart";
 import { SaveAlertButton } from "@/components/analysis/save-alert-button";
 import { ShareButton } from "@/components/analysis/share-button";
@@ -262,21 +263,21 @@ function AnalysisDashboardContent() {
             <div className="w-16 h-16 rounded-2xl bg-red-50 dark:bg-red-950/40 flex items-center justify-center mx-auto mb-5">
               <X className="w-8 h-8 text-red-500" />
             </div>
-            <h2 className="text-xl md:text-2xl font-bold text-ink mb-2">Analysis failed</h2>
+            <h2 className="text-xl md:text-2xl font-bold text-ink mb-2">{T("err.failed")}</h2>
             <p className="text-sm text-muted max-w-md mx-auto mb-6 leading-relaxed">{error}</p>
             <div className="flex items-center justify-center gap-3">
               <button
                 onClick={() => { setError(null); }}
                 className="h-11 px-5 rounded-xl border border-hairline bg-canvas text-ink text-sm font-semibold hover:bg-surface-soft transition-all"
               >
-                Dismiss
+                {T("err.dismiss")}
               </button>
               {areaParam && (
                 <button
                   onClick={() => runAnalysis(areaParam, true)}
                   className="h-11 px-5 rounded-xl bg-primary text-white text-sm font-semibold hover:bg-primary-active transition-all"
                 >
-                  Try again
+                  {T("err.tryAgain")}
                 </button>
               )}
             </div>
@@ -301,7 +302,7 @@ function AnalysisDashboardContent() {
                   {isCached ? (
                     <span className="shrink-0 inline-flex items-center gap-1.5 text-[12px] font-bold text-blue-700 bg-blue-50 dark:bg-blue-950/40 dark:text-blue-400 px-3 py-1 rounded-full border border-blue-100 dark:border-blue-900">
                       <Clock className="w-3 h-3" />
-                      Cached
+                      {T("dash.cached")}
                     </span>
                   ) : (
                     <span className="shrink-0 inline-flex items-center gap-1.5 text-[12px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/40 dark:text-emerald-400 px-3 py-1 rounded-full border border-emerald-100 dark:border-emerald-900">
@@ -309,7 +310,7 @@ function AnalysisDashboardContent() {
                         <span className="absolute inline-flex h-full w-full rounded-full bg-emerald-500 opacity-75 animate-ping" />
                         <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                       </span>
-                      Live data
+                      {T("dash.live")}
                     </span>
                   )}
                 </div>
@@ -319,9 +320,9 @@ function AnalysisDashboardContent() {
                     <span className="truncate">{formatDateTime(analysis.lastUpdated)}</span>
                   </span>
                   <span className="text-muted hidden sm:inline">·</span>
-                  <span className="text-muted hidden sm:inline">Crawled in {formatDuration(analysis.crawlDuration)}</span>
+                  <span className="text-muted hidden sm:inline">{T("dash.crawledIn")} {formatDuration(analysis.crawlDuration)}</span>
                   <span className="text-muted">·</span>
-                  <span className="text-muted font-medium">{formatNumber(analysis.listings.length)} listings</span>
+                  <span className="text-muted font-medium">{formatNumber(analysis.listings.length)} {T("dash.listings")}</span>
                 </div>
               </div>
 
@@ -439,7 +440,7 @@ function AnalysisDashboardContent() {
                   </div>
                 )}
 
-                {/* Item 1 + Item 2 — Calculator + Price History */}
+                {/* Calculators + Price History */}
                 <div className="grid grid-cols-1 lg:grid-cols-5 gap-4">
                   <div className="lg:col-span-2">
                     <FairPriceCalculator summary={analysis.summary} />
@@ -449,11 +450,14 @@ function AnalysisDashboardContent() {
                   </div>
                 </div>
 
+                {/* ROI / Yield calculator (Point 7) */}
+                <ROICalculator summary={analysis.summary} />
+
                 {/* Listings (table or map view) */}
                 <div>
                   <div className="flex items-end justify-between mb-4 gap-3 flex-wrap">
                     <h2 className="text-xl md:text-2xl font-bold text-ink tracking-tight">
-                      Unit Listings
+                      {T("dash.unitListings")}
                     </h2>
                     <div className="flex items-center gap-3">
                       <span className="text-sm text-muted font-medium">
@@ -472,7 +476,7 @@ function AnalysisDashboardContent() {
                             )}
                             aria-pressed={view === "list"}
                           >
-                            <ListIcon className="w-3.5 h-3.5" /> List
+                            <ListIcon className="w-3.5 h-3.5" /> {T("table.list")}
                           </button>
                           <button
                             onClick={() => setView("map")}
@@ -484,7 +488,7 @@ function AnalysisDashboardContent() {
                             )}
                             aria-pressed={view === "map"}
                           >
-                            <MapIcon className="w-3.5 h-3.5" /> Map
+                            <MapIcon className="w-3.5 h-3.5" /> {T("table.map")}
                           </button>
                         </div>
                       )}

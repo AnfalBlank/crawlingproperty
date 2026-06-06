@@ -1,17 +1,19 @@
 "use client";
 
 import { TrendingUp, ArrowUpRight, ArrowDownRight, Minus } from "lucide-react";
-import { cn, formatCurrency, toPeriod, periodSuffix } from "@/lib/utils";
+import { cn, formatCurrency, formatNumber, toPeriod, periodSuffix } from "@/lib/utils";
 import { PriceSummary } from "@/types";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 /**
  * Compact "snapshot" card that fills the 4th column on xl screens, summarising
  * the market in 4 numbers + a sparkline-ish bar.
  */
 export function MarketStatCard({ summary }: { summary: PriceSummary }) {
-  const { currency, getRate, rentalPeriod } = useAppStore();
+  const { currency, getRate, rentalPeriod, lang } = useAppStore();
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
 
   const fair = toPeriod(summary.fairPrice, rentalPeriod);
   const avg = toPeriod(summary.avgPrice, rentalPeriod);
@@ -20,10 +22,10 @@ export function MarketStatCard({ summary }: { summary: PriceSummary }) {
   // Spread: how volatile is this market? (avg-median delta as % of median)
   const spread = Math.abs(avg - median) / median;
   const stability =
-    spread < 0.05 ? { label: "Stable", color: "emerald", Icon: Minus } :
-    spread < 0.12 ? { label: "Balanced", color: "blue", Icon: TrendingUp } :
-    avg > median  ? { label: "Top-heavy", color: "amber", Icon: ArrowUpRight } :
-                    { label: "Skewed", color: "rose", Icon: ArrowDownRight };
+    spread < 0.05 ? { label: T("snap.stable"), color: "emerald", Icon: Minus } :
+    spread < 0.12 ? { label: T("snap.balanced"), color: "blue", Icon: TrendingUp } :
+    avg > median  ? { label: T("snap.topHeavy"), color: "amber", Icon: ArrowUpRight } :
+                    { label: T("snap.skewed"), color: "rose", Icon: ArrowDownRight };
 
   const colorClasses: Record<string, string> = {
     emerald: "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-400 dark:border-emerald-900",
@@ -36,8 +38,8 @@ export function MarketStatCard({ summary }: { summary: PriceSummary }) {
     <div className="bg-canvas dark:bg-canvas border border-hairline rounded-2xl p-5 h-full flex flex-col interactive-card">
       <div className="flex items-start justify-between gap-2 mb-4">
         <div>
-          <h3 className="text-[15px] font-bold text-ink tracking-tight">Market Snapshot</h3>
-          <p className="text-[12px] text-muted mt-0.5">Quick read of the market</p>
+          <h3 className="text-[15px] font-bold text-ink tracking-tight">{T("snap.title")}</h3>
+          <p className="text-[12px] text-muted mt-0.5">{T("snap.sub")}</p>
         </div>
         <div className={cn(
           "inline-flex items-center gap-1 text-[10px] font-bold px-2 py-1 rounded-full border",
@@ -50,20 +52,20 @@ export function MarketStatCard({ summary }: { summary: PriceSummary }) {
 
       {/* Big fair price */}
       <div className="bg-gradient-to-br from-rose-50 to-canvas dark:from-rose-950/20 dark:to-canvas border border-primary/15 rounded-xl px-4 py-3 mb-3">
-        <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">Fair Price</p>
+        <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{T("snap.fairPrice")}</p>
         <p className="text-2xl font-bold text-primary tabular-nums leading-none">
           {formatCurrency(fair, currency, rate)}
           <span className="text-xs text-muted font-normal ml-1">{periodSuffix(rentalPeriod)}</span>
         </p>
-        <p className="text-[11px] text-muted mt-1.5">70% median + 30% average</p>
+        <p className="text-[11px] text-muted mt-1.5">{T("kpi.formula")}</p>
       </div>
 
       {/* Stat rows */}
       <div className="space-y-2 flex-1">
         {[
-          { label: "Total listings", value: summary.totalListings.toLocaleString("en-US"), tone: "text-ink" },
-          { label: "Avg unit size", value: `${Math.round(summary.avgSqft)} ft²`, tone: "text-ink" },
-          { label: "Top unit type", value: summary.dominantUnitType, tone: "text-ink" },
+          { label: T("snap.totalListings"), value: formatNumber(summary.totalListings), tone: "text-ink" },
+          { label: T("snap.avgSize"), value: `${Math.round(summary.avgSqft)} ft²`, tone: "text-ink" },
+          { label: T("snap.topUnit"), value: summary.dominantUnitType, tone: "text-ink" },
         ].map((r) => (
           <div key={r.label} className="flex items-center justify-between text-[12px]">
             <span className="text-muted">{r.label}</span>
@@ -75,7 +77,7 @@ export function MarketStatCard({ summary }: { summary: PriceSummary }) {
       {/* Spread bar */}
       <div className="mt-4 pt-3 border-t border-hairline-soft">
         <div className="flex items-center justify-between text-[11px] text-muted mb-1.5">
-          <span>Avg vs Median spread</span>
+          <span>{T("snap.spread")}</span>
           <span className="font-bold text-ink">{(spread * 100).toFixed(1)}%</span>
         </div>
         <div className="h-1.5 bg-surface-strong rounded-full overflow-hidden">

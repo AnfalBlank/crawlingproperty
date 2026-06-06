@@ -21,6 +21,7 @@ import { Calculator, Sparkles, RotateCcw } from "lucide-react";
 import { cn, formatCurrency, formatNumber, getFairPriceStatus, toPeriod, periodSuffix } from "@/lib/utils";
 import { Furnishing, PriceSummary } from "@/types";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 interface Props {
   summary: PriceSummary;
@@ -41,8 +42,9 @@ const FURNISH_OPTS: { value: Furnishing; short: string; premium: number }[] = [
 ];
 
 export function FairPriceCalculator({ summary }: Props) {
-  const { currency, getRate, rentalPeriod } = useAppStore();
+  const { currency, getRate, rentalPeriod, lang } = useAppStore();
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
 
   const [bedrooms, setBedrooms]     = useState<string>("2");
   const [sqft, setSqft]             = useState<number>(Math.round(summary.avgSqft || 800));
@@ -79,15 +81,15 @@ export function FairPriceCalculator({ summary }: Props) {
             <Calculator className="w-4 h-4 text-primary" />
           </div>
           <div>
-            <h3 className="text-[15px] font-bold text-ink tracking-tight">Fair Price Calculator</h3>
-            <p className="text-[12px] text-muted">Estimate based on this area</p>
+            <h3 className="text-[15px] font-bold text-ink tracking-tight">{T("calc.title")}</h3>
+            <p className="text-[12px] text-muted">{T("calc.sub")}</p>
           </div>
         </div>
         <button
           onClick={reset}
           className="text-[12px] font-medium text-muted hover:text-ink transition-colors flex items-center gap-1"
         >
-          <RotateCcw className="w-3 h-3" /> Reset
+          <RotateCcw className="w-3 h-3" /> {T("calc.reset")}
         </button>
       </div>
 
@@ -95,7 +97,7 @@ export function FairPriceCalculator({ summary }: Props) {
       <div className="space-y-4">
         {/* Bedrooms */}
         <div>
-          <label className="text-[11px] font-bold text-muted uppercase tracking-widest mb-2 block">Bedrooms</label>
+          <label className="text-[11px] font-bold text-muted uppercase tracking-widest mb-2 block">{T("calc.bedrooms")}</label>
           <div className="grid grid-cols-5 gap-1.5">
             {BEDROOM_OPTS.map((o) => (
               <button
@@ -117,7 +119,7 @@ export function FairPriceCalculator({ summary }: Props) {
         {/* Sqft slider + input */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="text-[11px] font-bold text-muted uppercase tracking-widest">Built-up size</label>
+            <label className="text-[11px] font-bold text-muted uppercase tracking-widest">{T("calc.builtUp")}</label>
             <span className="text-[12px] font-bold text-ink tabular-nums">{formatNumber(sqft)} ft²</span>
           </div>
           <input
@@ -135,7 +137,7 @@ export function FairPriceCalculator({ summary }: Props) {
 
         {/* Furnishing */}
         <div>
-          <label className="text-[11px] font-bold text-muted uppercase tracking-widest mb-2 block">Furnishing</label>
+          <label className="text-[11px] font-bold text-muted uppercase tracking-widest mb-2 block">{T("calc.furnishing")}</label>
           <div className="grid grid-cols-3 gap-1.5">
             {FURNISH_OPTS.map((o) => (
               <button
@@ -157,7 +159,7 @@ export function FairPriceCalculator({ summary }: Props) {
         {/* Your price (optional vs-market) */}
         <div>
           <label htmlFor="fpc-your-price" className="text-[11px] font-bold text-muted uppercase tracking-widest mb-2 block">
-            Your price <span className="text-muted-soft normal-case">(optional)</span>
+            {T("calc.yourPrice")} <span className="text-muted-soft normal-case">{T("calc.optional")}</span>
           </label>
           <div className="relative">
             <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] font-semibold text-muted">RM</span>
@@ -176,7 +178,7 @@ export function FairPriceCalculator({ summary }: Props) {
 
       {/* Result */}
       <div className="mt-5 pt-5 border-t border-hairline-soft">
-        <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">Estimated fair rent</p>
+        <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-2">{T("calc.estFair")}</p>
         <div className="flex items-end justify-between gap-3 flex-wrap">
           <div>
             <p className="text-3xl font-bold text-primary tabular-nums leading-none">
@@ -205,7 +207,7 @@ export function FairPriceCalculator({ summary }: Props) {
                 status === "Under Market" ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-400" :
                                             "bg-surface-strong text-ink"
               )}>
-                {status === "Under Market" ? "Under" : status === "Overpriced" ? "Over" : "Fair"}
+                {status === "Under Market" ? T("calc.under") : status === "Overpriced" ? T("calc.over") : T("calc.fair")}
               </p>
             </div>
           )}

@@ -13,6 +13,7 @@ import {
 import { TrendingUp, TrendingDown, Minus, History, Sparkles } from "lucide-react";
 import { cn, formatCurrency, calcLinearTrend, formatDate } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 interface Point {
   snapshotAt: string;
@@ -27,8 +28,9 @@ interface Props {
 }
 
 export function PriceHistoryChart({ area }: Props) {
-  const { currency, getRate } = useAppStore();
+  const { currency, getRate, lang } = useAppStore();
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
 
   const [points, setPoints] = useState<Point[]>([]);
   const [days, setDays] = useState<30 | 60 | 90>(60);
@@ -73,8 +75,8 @@ export function PriceHistoryChart({ area }: Props) {
             <History className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
-            <h3 className="text-[15px] font-bold text-ink tracking-tight">Price History</h3>
-            <p className="text-[12px] text-muted">{area} — last {days} days</p>
+            <h3 className="text-[15px] font-bold text-ink tracking-tight">{T("hist.title")}</h3>
+            <p className="text-[12px] text-muted">{area} · {days}d</p>
           </div>
         </div>
 
@@ -105,9 +107,9 @@ export function PriceHistoryChart({ area }: Props) {
           <div className="w-12 h-12 rounded-full bg-surface-soft dark:bg-surface-strong flex items-center justify-center mb-3">
             <Sparkles className="w-5 h-5 text-muted" />
           </div>
-          <p className="text-sm font-semibold text-ink">Tracking starts now</p>
+          <p className="text-sm font-semibold text-ink">{T("hist.trackingStarts")}</p>
           <p className="text-xs text-muted mt-1 max-w-xs">
-            We&apos;ll record a snapshot each time this area is analyzed. Check back in 24h to see trends.
+            {T("hist.trackingSub")}
           </p>
         </div>
       ) : (
@@ -132,7 +134,7 @@ export function PriceHistoryChart({ area }: Props) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[12px] font-bold text-ink">
-                  Trending {trend.direction === "up" ? "up" : trend.direction === "down" ? "down" : "flat"}
+                  {trend.direction === "up" ? T("hist.trendingUp") : trend.direction === "down" ? T("hist.trendingDown") : T("hist.trendingFlat")}
                   {" "}
                   <span className={cn(
                     "tabular-nums",
@@ -142,10 +144,10 @@ export function PriceHistoryChart({ area }: Props) {
                   )}>
                     {trend.percent > 0 ? "+" : ""}{trend.percent.toFixed(1)}%
                   </span>
-                  {" "}forecast in 30 days
+                  {" "}{T("hist.forecast")}
                 </p>
                 <p className="text-[11px] text-muted mt-0.5">
-                  Projected fair price ≈ {formatCurrency(trend.projected30d, currency, rate)}
+                  {T("hist.projected")} ≈ {formatCurrency(trend.projected30d, currency, rate)}
                 </p>
               </div>
             </div>
@@ -177,13 +179,13 @@ export function PriceHistoryChart({ area }: Props) {
               />
               <Legend iconType="circle" iconSize={8} formatter={(v) => <span style={{ fontSize: 11, color: "var(--color-muted)" }}>{v}</span>} />
               <Area
-                type="monotone" dataKey="fairPriceConv" name="Fair Price"
+                type="monotone" dataKey="fairPriceConv" name={T("chart.fairPrice")}
                 stroke="#FF385C" strokeWidth={2.5}
                 fill="url(#histFair)"
                 animationDuration={700}
               />
-              <Line type="monotone" dataKey="avgPriceConv"    name="Avg"    stroke="#3b82f6" strokeWidth={1.8} dot={false} animationDuration={700} />
-              <Line type="monotone" dataKey="medianPriceConv" name="Median" stroke="#10b981" strokeWidth={1.8} dot={false} strokeDasharray="4 3" animationDuration={700} />
+              <Line type="monotone" dataKey="avgPriceConv"    name={T("chart.average")} stroke="#3b82f6" strokeWidth={1.8} dot={false} animationDuration={700} />
+              <Line type="monotone" dataKey="medianPriceConv" name={T("chart.median")} stroke="#10b981" strokeWidth={1.8} dot={false} strokeDasharray="4 3" animationDuration={700} />
             </AreaChart>
           </ResponsiveContainer>
         </>

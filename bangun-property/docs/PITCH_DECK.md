@@ -128,9 +128,10 @@ Map markers, table badges, and the modal vs-price diff all use the same formula.
 | Map view with colour-coded pins | ✅ |
 | Side-by-side area comparison (≤5) | ✅ |
 | Fair-price calculator | ✅ |
+| Rental yield / ROI calculator | ✅ |
 | 30/60/90-day price history | ✅ |
 | Linear-regression 30-day forecast | ✅ |
-| Saved searches / alerts (email) | ✅ |
+| Saved searches / email alerts | ✅ |
 | 9-currency support | ✅ |
 | Daily/Monthly/Yearly period toggle | ✅ |
 | Excel + CSV export | ✅ |
@@ -227,15 +228,16 @@ Average analysis time: **9–18 s** uncached, **~50 ms** cached.
 ## Slide 13 — Roadmap
 
 ### Phase 1 (shipped)
-✓ Live crawl, dashboard, comparison, alerts, modal, map, history, forecast, multi-currency, multi-language, admin, cron
+✓ Live crawl, dashboard, comparison, alerts, modal, map, history, forecast, multi-currency, multi-language (full dashboard i18n), admin, cron
+✓ Rental yield / ROI calculator
+✓ Saved-search email alerts (Resend-powered, daily cron dispatch)
 
 ### Phase 2 (next 4 weeks)
-- ROI / Rental yield calculator
 - Geocoding fallback (Nominatim) for listings without lat/lng
-- Email dispatch on saved-search match (cron driven)
 - Per-property alert ("notify me when this listing's price changes")
 - WhatsApp share button
 - Mobile PWA install prompt
+- User accounts (sync saved searches across devices)
 
 ### Phase 3 (3–6 months)
 - Sale price intelligence (currently rentals only)

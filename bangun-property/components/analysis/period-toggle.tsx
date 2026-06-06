@@ -3,11 +3,12 @@
 import { Calendar, CalendarDays, CalendarRange } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 const PERIODS = [
-  { key: "daily" as const, label: "Daily", short: "D", icon: Calendar },
-  { key: "monthly" as const, label: "Monthly", short: "M", icon: CalendarDays },
-  { key: "yearly" as const, label: "Yearly", short: "Y", icon: CalendarRange },
+  { key: "daily" as const, tkey: "period.daily" as const, short: "D", icon: Calendar },
+  { key: "monthly" as const, tkey: "period.monthly" as const, short: "M", icon: CalendarDays },
+  { key: "yearly" as const, tkey: "period.yearly" as const, short: "Y", icon: CalendarRange },
 ];
 
 /**
@@ -15,7 +16,7 @@ const PERIODS = [
  * price figures across KPIs, charts, and the listings table — no reload.
  */
 export function PeriodToggle({ className }: { className?: string }) {
-  const { rentalPeriod, setRentalPeriod } = useAppStore();
+  const { rentalPeriod, setRentalPeriod, lang } = useAppStore();
 
   return (
     <div
@@ -26,7 +27,7 @@ export function PeriodToggle({ className }: { className?: string }) {
       role="tablist"
       aria-label="Rental period"
     >
-      {PERIODS.map(({ key, label, short, icon: Icon }) => {
+      {PERIODS.map(({ key, tkey, short, icon: Icon }) => {
         const active = rentalPeriod === key;
         return (
           <button
@@ -42,7 +43,7 @@ export function PeriodToggle({ className }: { className?: string }) {
             )}
           >
             <Icon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{label}</span>
+            <span className="hidden sm:inline">{t(lang, tkey)}</span>
             <span className="sm:hidden">{short}</span>
           </button>
         );

@@ -295,7 +295,6 @@ export function calcLinearTrend(
 }
 
 // ─── URL Helpers (Item 8 — Share dashboard) ──────────────────────────────────
-
 export function buildShareUrl(params: {
   area: string;
   currency?: string;
@@ -309,4 +308,50 @@ export function buildShareUrl(params: {
   if (params.period && params.period !== "monthly") u.searchParams.set("period", params.period);
   if (params.compare) u.searchParams.set("compare", "1");
   return u.toString();
+}
+
+// ─── Rental Yield / ROI (Point 7 — investor calculator) ──────────────────────
+
+export interface YieldResult {
+  /** Annual rent (12 × monthly) in MYR */
+  annualGross: number;
+  /** Annual rent minus annual costs */
+  annualNet: number;
+  /** Gross yield % = annualGross / purchasePrice × 100 */
+  grossYield: number;
+  /** Net yield % = annualNet / purchasePrice × 100 */
+  netYield: number;
+  /** Years to recoup the purchase price from net income */
+  paybackYears: number;
+  /** Qualitative rating bucket based on net yield */
+  rating: "excellent" | "good" | "average" | "low";
+}
+
+/**
+ * Compute rental yield for a hypothetical purchase.
+ * All money values in MYR (base currency); convert for display only.
+ *
+ * Malaysian residential rental yields typically run 3–6 %:
+ *   ≥ 6 % excellent · 4.5–6 % good · 3–4.5 % average · < 3 % low
+ */
+export function calcYield(input: {
+  purchasePrice: number;
+  monthlyRent: number;
+  monthlyCosts?: number;
+}): YieldResult | null {
+  const { purchasePrice, monthlyRent, monthlyCosts = 0 } = input;
+  if (!purchasePrice || purchasePrice <= 0 || !monthlyRent || monthlyRent <= 0) return null;
+
+  const annualGross = monthlyRent * 12;
+  const annualNet = Math.max(0, (monthlyRent - monthlyCosts) * 12);
+  const grossYield = (annualGross / purchasePrice) * 100;
+  const netYield = (annualNet / purchasePrice) * 100;
+  const paybackYears = annualNet > 0 ? purchasePrice / annualNet : Infinity;
+
+  const rating: YieldResult["rating"] =
+    netYield >= 6 ? "excellent" :
+    netYield >= 4.5 ? "good" :
+    netYield >= 3 ? "average" : "low";
+
+  return { annualGross, annualNet, grossYield, netYield, paybackYears, rating };
 }

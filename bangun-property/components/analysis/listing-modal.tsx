@@ -12,6 +12,7 @@ import { cn, formatCurrency, formatNumber, toPeriod, periodSuffix } from "@/lib/
 import { Listing, PriceSummary } from "@/types";
 import { useAppStore } from "@/store/app-store";
 import { FairPriceBadge } from "@/components/ui/badge";
+import { t } from "@/lib/i18n";
 
 // ── Mini map (Leaflet) — lazy loaded to avoid SSR issues ────────────────────
 const ListingMiniMap = dynamic(() => import("./listing-mini-map"), {
@@ -28,8 +29,9 @@ interface ListingModalProps {
 }
 
 export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
-  const { currency, getRate, rentalPeriod } = useAppStore();
+  const { currency, getRate, rentalPeriod, lang } = useAppStore();
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
   const [photoIdx, setPhotoIdx] = useState(0);
   const [copied, setCopied] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -206,7 +208,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             <div className="bg-gradient-to-br from-rose-50 to-canvas dark:from-rose-950/20 dark:to-canvas border border-primary/15 rounded-2xl p-4 md:p-5">
               <div className="flex items-end justify-between gap-3 flex-wrap">
                 <div>
-                  <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">Asking Rent</p>
+                  <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{T("modal.askingRent")}</p>
                   <p className="text-2xl sm:text-3xl md:text-4xl font-bold text-primary tabular-nums leading-none">
                     {formatCurrency(periodPrice, currency, rate)}
                     <span className="text-sm text-muted font-normal ml-1">{periodSuffix(rentalPeriod)}</span>
@@ -217,7 +219,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
                 </div>
                 {fair && monthly > 0 && (
                   <div className="text-right">
-                    <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">vs Fair Price</p>
+                    <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{T("modal.vsFair")}</p>
                     <p className={cn(
                       "text-base sm:text-lg font-bold tabular-nums",
                       diff > 5 ? "text-red-600 dark:text-red-400"
@@ -235,11 +237,11 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             {/* Meta chips */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
               {[
-                { Icon: BedDouble, label: listing.bedrooms === "Studio" ? "Studio" : `${listing.bedrooms} Bed` },
-                { Icon: Bath, label: `${listing.bathrooms} Bath` },
+                { Icon: BedDouble, label: listing.bedrooms === "Studio" ? "Studio" : `${listing.bedrooms} ${T("modal.bed")}` },
+                { Icon: Bath, label: `${listing.bathrooms} ${T("modal.bath")}` },
                 { Icon: Maximize2, label: `${formatNumber(listing.sqft)} ft²` },
                 { Icon: Sofa, label: listing.furnishing },
-                ...(listing.carpark != null ? [{ Icon: Car, label: `${listing.carpark} carpark` }] : []),
+                ...(listing.carpark != null ? [{ Icon: Car, label: `${listing.carpark} ${T("modal.carpark")}` }] : []),
               ].map(({ Icon, label }) => (
                 <div key={label} className="flex items-center gap-2 bg-surface-soft dark:bg-surface-strong rounded-xl px-3 py-2.5">
                   <Icon className="w-4 h-4 text-primary shrink-0" />
@@ -252,7 +254,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             {listing.latitude && listing.longitude && (
               <div>
                 <h3 className="text-sm font-bold text-ink mb-2 flex items-center gap-1.5">
-                  <MapPin className="w-4 h-4 text-primary" /> Location
+                  <MapPin className="w-4 h-4 text-primary" /> {T("modal.location")}
                 </h3>
                 <ListingMiniMap
                   lat={listing.latitude}
@@ -266,7 +268,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             {listing.description && (
               <div>
                 <h3 className="text-sm font-bold text-ink mb-2 flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-primary" /> About this place
+                  <Sparkles className="w-4 h-4 text-primary" /> {T("modal.about")}
                 </h3>
                 <p className="text-sm text-body whitespace-pre-line leading-relaxed line-clamp-[10]">
                   {listing.description}
@@ -277,7 +279,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             {/* Facilities */}
             {listing.facilities && listing.facilities.length > 0 && (
               <div>
-                <h3 className="text-sm font-bold text-ink mb-2">Facilities</h3>
+                <h3 className="text-sm font-bold text-ink mb-2">{T("modal.facilities")}</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {listing.facilities.map((f) => (
                     <span key={f} className="text-[12px] font-medium text-ink bg-surface-soft dark:bg-surface-strong px-2.5 py-1 rounded-full border border-hairline capitalize">
@@ -291,7 +293,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             {/* Furnishes */}
             {listing.furnishes && listing.furnishes.length > 0 && (
               <div>
-                <h3 className="text-sm font-bold text-ink mb-2">Included furnishings</h3>
+                <h3 className="text-sm font-bold text-ink mb-2">{T("modal.furnishings")}</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {listing.furnishes.map((f) => (
                     <span key={f} className="text-[12px] font-medium text-muted bg-surface-soft dark:bg-surface-strong px-2.5 py-1 rounded-full capitalize">
@@ -311,7 +313,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             className="h-11 px-4 rounded-xl border border-hairline text-sm font-semibold text-ink hover:bg-surface-soft dark:hover:bg-surface-strong transition-colors flex items-center gap-1.5"
           >
             {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-            <span className="hidden sm:inline">{copied ? "Copied" : "Copy link"}</span>
+            <span className="hidden sm:inline">{copied ? T("modal.copied") : T("modal.copyLink")}</span>
           </button>
           <a
             href={listing.url}
@@ -319,7 +321,7 @@ export function ListingModal({ listing, summary, onClose }: ListingModalProps) {
             rel="noopener noreferrer"
             className="flex-1 h-11 rounded-xl bg-primary hover:bg-primary-active text-white text-sm font-bold flex items-center justify-center gap-1.5 transition-colors btn-lift"
           >
-            View on SPEEDHOME <ExternalLink className="w-4 h-4" />
+            {T("modal.viewSh")} <ExternalLink className="w-4 h-4" />
           </a>
         </div>
       </div>

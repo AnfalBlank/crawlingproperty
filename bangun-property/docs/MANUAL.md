@@ -15,14 +15,15 @@
 7. [Map view](#7-map-view)
 8. [Comparing areas](#8-comparing-areas)
 9. [Fair price calculator](#9-fair-price-calculator)
-10. [Price history & trend](#10-price-history--trend)
-11. [Saved alerts](#11-saved-alerts)
-12. [Sharing & exporting](#12-sharing--exporting)
-13. [Currency & period](#13-currency--period)
-14. [Theme & language](#14-theme--language)
-15. [Admin dashboard](#15-admin-dashboard)
-16. [Keyboard shortcuts](#16-keyboard-shortcuts)
-17. [Troubleshooting](#17-troubleshooting)
+10. [ROI / yield calculator](#10-roi--yield-calculator)
+11. [Price history & trend](#11-price-history--trend)
+12. [Saved alerts](#12-saved-alerts)
+13. [Sharing & exporting](#13-sharing--exporting)
+14. [Currency & period](#14-currency--period)
+15. [Theme & language](#15-theme--language)
+16. [Admin dashboard](#16-admin-dashboard)
+17. [Keyboard shortcuts](#17-keyboard-shortcuts)
+18. [Troubleshooting](#18-troubleshooting)
 
 ---
 
@@ -206,7 +207,28 @@ This is a heuristic intended for quick gut-checks, not a regulated valuation.
 
 ---
 
-## 10. Price history & trend
+## 10. ROI / yield calculator
+
+For investors. Below the fair-price calculator, the ROI calculator estimates rental return on a hypothetical purchase:
+
+| Input | Effect |
+|---|---|
+| Purchase price | The amount you'd pay for the unit (RM) |
+| Monthly rent | Expected rent — click "Use fair price" to autofill the area's fair price |
+| Monthly costs (optional) | Maintenance, service charge, sinking fund, etc. |
+
+Outputs:
+- **Gross Yield** = annual rent ÷ purchase price × 100
+- **Net Yield** = (annual rent − annual costs) ÷ purchase price × 100
+- **Annual income** (net)
+- **Payback period** in years
+- A rating badge: Excellent (≥6%), Good (4.5–6%), Average (3–4.5%), Low (<3%) — benchmarked against typical Malaysian residential yields
+
+This is a heuristic, not financial advice.
+
+---
+
+## 11. Price history & trend
 
 The Price History chart loads `/api/history?area=...&days=N` and renders a multi-line area chart over 30, 60, or 90 days.
 
@@ -219,7 +241,7 @@ If the area has only one snapshot, you see an empty state ("Tracking starts now"
 
 ---
 
-## 11. Saved alerts
+## 12. Saved alerts
 
 Click the `Alert` button to save a search:
 - **Area** (auto-filled from current view)
@@ -231,7 +253,7 @@ Alerts are stored server-side. The list endpoint is admin-gated (so you can't re
 
 ---
 
-## 12. Sharing & exporting
+## 13. Sharing & exporting
 
 ### Share
 Click `Share` to copy a deep link with your current state encoded:
@@ -252,7 +274,7 @@ Filename format: `SPEEDHOME_<Area>_<YYYYMMDD>.xlsx`
 
 ---
 
-## 13. Currency & period
+## 14. Currency & period
 
 Two controls in the navbar / action bar:
 
@@ -265,16 +287,16 @@ Switch between `Daily` / `Monthly` / `Yearly`. The toggle reformats every price 
 
 ---
 
-## 14. Theme & language
+## 15. Theme & language
 
 - **Theme** — Sun / Moon icon in the navbar toggles light/dark. Stored on device.
 - **Language** — Globe icon offers EN · MS · ID · ZH. Stored on device.
 
-The language toggle covers nav, hero, footer, and the major dashboard labels. Some component-internal strings are still English.
+The language toggle covers the navbar, hero, footer, and the full analysis dashboard — KPIs, charts, filters, calculators, comparison, modal, alerts, and history. The admin console remains English.
 
 ---
 
-## 15. Admin dashboard
+## 16. Admin dashboard
 
 Open `/admin`. You'll be prompted for an admin token (from `ADMIN_TOKEN` env). After login, four tabs:
 
@@ -289,7 +311,7 @@ Logout via the `Logout` button at the top right.
 
 ---
 
-## 16. Keyboard shortcuts
+## 17. Keyboard shortcuts
 
 Within the listing modal:
 
@@ -301,7 +323,7 @@ Within the listing modal:
 
 ---
 
-## 17. Troubleshooting
+## 18. Troubleshooting
 
 ### "Rate limit reached"
 Too many requests in a short window. Wait the retry-after seconds shown in the toast. Per-IP limits:

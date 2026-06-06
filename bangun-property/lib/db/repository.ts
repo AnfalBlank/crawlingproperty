@@ -434,3 +434,51 @@ export async function deleteSavedSearch(id: number): Promise<void> {
   const db = getDb();
   await db.execute({ sql: "DELETE FROM saved_searches WHERE id = ?", args: [id] });
 }
+
+/** Mark a saved search as notified (sets last_notified_at to now). */
+export async function markSavedSearchNotified(id: number): Promise<void> {
+  await ensureSchema();
+  const db = getDb();
+  await db.execute({
+    sql: "UPDATE saved_searches SET last_notified_at = datetime('now') WHERE id = ?",
+    args: [id],
+  });
+}
+
+/**
+ * Find listings in an area that match a saved search's thresholds.
+ * Used by the alert dispatcher (cron) to decide what to notify about.
+ */
+export async function findMatchingListings(input: {
+  areaName: string;
+  maxPrice: number | null;
+  minBedrooms: number | null;
+}): Promise<Listing[]> {
+  await ensureSchema();
+  const db = getDb();
+  const slug = input.areaName.toLowerCase().replace(/\s+/g, "-");
+
+  // Resolve area id via slug
+  const areaRow = await db.execute({ sql: "SELECT id FROM areas WHERE slug = ?", args: [slug] });
+  if (areaRow.rows.length === 0) return [];
+  const areaId = Number(areaRow.rows[0].id);
+
+  const clauses: string[] = ["area_id = ?", "monthly_rent IS NOT NULL"];
+  const args: (string | number)[] = [areaId];
+
+  if (input.maxPrice != null) {
+    clauses.push("monthly_rent <= ?");
+    args.push(input.maxPrice);
+  }
+  if (input.minBedrooms != null) {
+    // bedrooms stored as TEXT ("Studio" or number) — only numeric ones can satisfy a min
+    clauses.push("CAST(bedrooms AS INTEGER) >= ?");
+    args.push(input.minBedrooms);
+  }
+
+  const r = await db.execute({
+    sql: `SELECT * FROM listings WHERE ${clauses.join(" AND ")} ORDER BY monthly_rent ASC LIMIT 20`,
+    args,
+  });
+  return r.rows.map(rowToListing);
+}

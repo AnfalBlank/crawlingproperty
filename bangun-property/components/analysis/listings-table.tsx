@@ -17,6 +17,7 @@ import { Listing, PriceSummary } from "@/types";
 import { useAppStore } from "@/store/app-store";
 import { FairPriceBadge, Badge } from "@/components/ui/badge";
 import { ListingModal } from "./listing-modal";
+import { t } from "@/lib/i18n";
 
 interface ListingsTableProps {
   listings: Listing[];
@@ -62,10 +63,11 @@ function SortIcon({ active, dir }: { active: boolean; dir: SortDir }) {
 }
 
 export function ListingsTable({ listings, summary }: ListingsTableProps) {
-  const { currency, getRate, filters, activePriceBucket, rentalPeriod } = useAppStore();
+  const { currency, getRate, filters, activePriceBucket, rentalPeriod, lang } = useAppStore();
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
   const sfx = periodSuffix(rentalPeriod);
-  const periodLabel = rentalPeriod === "daily" ? "Daily" : rentalPeriod === "yearly" ? "Yearly" : "Monthly";
+  const periodLabel = rentalPeriod === "daily" ? T("period.daily") : rentalPeriod === "yearly" ? T("period.yearly") : T("period.monthly");
 
   // Period-aware formatter — converts a stored monthly rent to the active period.
   const fmtPeriod = (monthly: number | null) =>
@@ -214,9 +216,9 @@ export function ListingsTable({ listings, summary }: ListingsTableProps) {
       {/* Table Header Controls */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-4 py-3 border-b border-hairline bg-surface-soft/50 dark:bg-surface-strong/30">
         <p className="text-sm font-medium text-ink shrink-0">
-          {formatNumber(filtered.length)} listings
+          {formatNumber(filtered.length)} {T("table.listings")}
           {filtered.length !== listings.length && (
-            <span className="text-muted ml-1 text-xs">(filtered from {formatNumber(listings.length)})</span>
+            <span className="text-muted ml-1 text-xs">({T("table.filteredFrom")} {formatNumber(listings.length)})</span>
           )}
         </p>
         {/* Column visibility toggles — hidden on mobile (card view used instead) */}
@@ -284,14 +286,14 @@ export function ListingsTable({ listings, summary }: ListingsTableProps) {
                   className="h-9 px-3 flex items-center gap-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/15 transition-colors"
                   aria-label="View details"
                 >
-                  <Eye className="w-3 h-3" /> Details
+                  <Eye className="w-3 h-3" /> {T("table.details")}
                 </button>
               </div>
             </div>
           </div>
         ))}
         {paginated.length === 0 && (
-          <div className="py-12 text-center text-muted text-sm">No listings match your filters.</div>
+          <div className="py-12 text-center text-muted text-sm">{T("table.noMatch")}</div>
         )}
       </div>
 
@@ -300,17 +302,17 @@ export function ListingsTable({ listings, summary }: ListingsTableProps) {
         <table className="w-full text-sm" role="table" aria-label="Listings table">
           <thead>
             <tr>
-              <ColHeader label="Listing" sortable colKey="title" className="min-w-[220px]" />
-              <ColHeader label="Bedrooms" sortable colKey="bedrooms" />
-              {visibleCols.bathrooms && <ColHeader label="Bath" sortable colKey="bathrooms" />}
-              <ColHeader label={`${periodLabel} Rent`} sortable colKey="monthlyRent" />
-              {visibleCols.yearlyRent && <ColHeader label="Yearly" />}
-              {visibleCols.dailyRent && <ColHeader label="Daily" />}
-              {visibleCols.sqft && <ColHeader label="Sqft" sortable colKey="sqft" />}
-              {visibleCols.pricePerSqft && <ColHeader label="Price/Sqft" sortable colKey="pricePerSqft" />}
-              {visibleCols.furnishing && <ColHeader label="Furnishing" sortable colKey="furnishing" />}
-              <ColHeader label="Status" />
-              {visibleCols.url && <ColHeader label="Link" />}
+              <ColHeader label={T("table.listing")} sortable colKey="title" className="min-w-[220px]" />
+              <ColHeader label={T("filters.bedrooms")} sortable colKey="bedrooms" />
+              {visibleCols.bathrooms && <ColHeader label={T("table.bath")} sortable colKey="bathrooms" />}
+              <ColHeader label={`${periodLabel} ${T("table.rent")}`} sortable colKey="monthlyRent" />
+              {visibleCols.yearlyRent && <ColHeader label={T("period.yearly")} />}
+              {visibleCols.dailyRent && <ColHeader label={T("period.daily")} />}
+              {visibleCols.sqft && <ColHeader label={T("table.sqft")} sortable colKey="sqft" />}
+              {visibleCols.pricePerSqft && <ColHeader label={T("kpi.psf")} sortable colKey="pricePerSqft" />}
+              {visibleCols.furnishing && <ColHeader label={T("table.furnishing")} sortable colKey="furnishing" />}
+              <ColHeader label={T("table.status")} />
+              {visibleCols.url && <ColHeader label={T("table.link")} />}
             </tr>
           </thead>
           <tbody>
@@ -396,7 +398,7 @@ export function ListingsTable({ listings, summary }: ListingsTableProps) {
       {totalPages > 1 && (
         <div className="flex items-center justify-between px-4 py-3 border-t border-hairline bg-surface-soft/30 dark:bg-surface-strong/20">
           <p className="text-xs text-muted">
-            Page {page} of {totalPages} · {filtered.length} listings
+            {T("table.page")} {page} {T("table.of")} {totalPages} · {filtered.length} {T("table.listings")}
           </p>
           <div className="flex items-center gap-1">
             <button

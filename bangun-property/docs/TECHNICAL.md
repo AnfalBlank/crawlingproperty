@@ -359,7 +359,7 @@ Body `{ areaName, email?, maxPrice?, minBedrooms? }`. Validates length (areaName
 Read endpoints for the admin UI.
 
 #### `POST /api/admin`
-Actions: `start-crawl` (body `{ area }`), `clear-cache`, `refresh-rates`, `delete-history` (body `{ historyId }`).
+Actions: `start-crawl` (body `{ area }`), `clear-cache`, `refresh-rates`, `delete-history` (body `{ historyId }`), `dispatch-alerts` (manually trigger saved-search email dispatch).
 
 #### `POST /api/admin/login`
 Body `{ token }`. Sets `admin_token` httpOnly cookie (8 h, sameSite=lax, secure in prod).
@@ -382,7 +382,7 @@ Schema bootstrap + rate seed. Idempotent.
 ### Cron (require `Authorization: Bearer CRON_SECRET`)
 
 #### `GET /api/cron/refresh`
-Refreshes top 10 areas + exchange rates. Designed for Vercel Cron (`vercel.json` schedules `0 3 * * *`).
+Refreshes top 10 areas + exchange rates, then dispatches saved-search email alerts (Point 6). Designed for Vercel Cron (`vercel.json` schedules `0 3 * * *`).
 
 ---
 
@@ -592,6 +592,10 @@ SPEEDHOME_BASE_URL=https://speedhome.com
 ADMIN_TOKEN=long-random-secret
 CRON_SECRET=long-random-secret
 
+# Email alerts (optional — Point 6). When unset, alerts are stored but not emailed.
+RESEND_API_KEY=
+ALERT_FROM_EMAIL=Estate Insight <alerts@estate-insight.app>
+
 # Public site URL (sitemap, robots, OG)
 NEXT_PUBLIC_SITE_URL=https://your-domain.example.com
 ```
@@ -742,11 +746,11 @@ API latencies (cached):
 ## 20. Known limitations
 
 1. **Geocoding fallback** — listings without `latitude`/`longitude` from SPEEDHOME aren't plotted. No Nominatim/Google fallback yet.
-2. **i18n incomplete** — analysis sub-components and admin UI mostly English.
+2. **i18n** — full coverage across nav, hero, footer, dashboard, charts, modal, comparison, calculators, filters, and alerts in 4 languages (EN/MS/ID/ZH). Admin console remains English.
 3. **Rate limiter is per-instance** — multi-instance deploys would need Redis-backed limiter.
 4. **In-memory job queue** — survives HMR but not server restart. Acceptable trade-off for MVP.
 5. **No tests** — neither unit nor e2e. PRD acceptance criteria checked manually.
-6. **No alert dispatch** — alerts are stored but no email is sent yet (cron job to wire).
+6. **Alert email requires Resend** — alerts are stored + matched, and dispatched daily via cron, but only emailed when `RESEND_API_KEY` is set. Without it, dispatch is a safe no-op.
 7. **Auto-rotate on Turso** — depends on Turso's own retention; no app-side cleanup of `crawl_jobs` / `scan_history` rows.
 8. **PRD §40 ROI/Yield calculator** — not implemented (Phase 2).
 

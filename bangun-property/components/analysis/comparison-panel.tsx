@@ -14,12 +14,14 @@ import {
 import { cn, formatCurrency, formatNumber } from "@/lib/utils";
 import { AreaComparisonItem } from "@/types";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 const POPULAR_AREAS = ["Mont Kiara", "KLCC", "Bangsar", "Petaling Jaya", "Subang Jaya", "Damansara", "Cheras", "Puchong"];
 
 export function ComparisonPanel() {
-  const { currency, getRate, comparison, setComparison, savedComparisons, saveComparison, deleteSavedComparison } = useAppStore();
+  const { currency, getRate, comparison, setComparison, savedComparisons, saveComparison, deleteSavedComparison, lang } = useAppStore();
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
 
   const [areaInput, setAreaInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -168,8 +170,8 @@ export function ComparisonPanel() {
             <GitCompare className="w-4 h-4 text-blue-600" />
           </div>
           <div>
-            <h3 className="text-[15px] font-semibold text-ink">Area Comparison</h3>
-            <p className="text-xs text-muted">Compare up to 5 areas</p>
+            <h3 className="text-[15px] font-semibold text-ink">{T("cmp.title")}</h3>
+            <p className="text-xs text-muted">{T("cmp.sub")}</p>
           </div>
         </div>
 
@@ -180,7 +182,7 @@ export function ComparisonPanel() {
               className="flex items-center gap-1 text-xs font-medium text-muted hover:text-ink transition-colors"
             >
               <Star className="w-3.5 h-3.5" />
-              Saved ({savedComparisons.length})
+              {T("cmp.saved")} ({savedComparisons.length})
             </button>
           )}
           {comparison && (
@@ -189,7 +191,7 @@ export function ComparisonPanel() {
               className="flex items-center gap-1 text-xs font-medium text-primary hover:underline"
             >
               <Save className="w-3.5 h-3.5" />
-              Save
+              {T("cmp.save")}
             </button>
           )}
         </div>
@@ -245,7 +247,7 @@ export function ComparisonPanel() {
             value={areaInput}
             onChange={(e) => setAreaInput(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addArea()}
-            placeholder="Add area to compare..."
+            placeholder={T("cmp.addPh")}
             disabled={!canAdd}
             list="comparison-areas"
             className={cn(
@@ -269,7 +271,7 @@ export function ComparisonPanel() {
           ) : (
             <Plus className="w-4 h-4" />
           )}
-          Add
+          {T("cmp.add")}
         </button>
       </div>
 
@@ -393,7 +395,7 @@ export function ComparisonPanel() {
                 </svg>
               </div>
               <p className="text-sm text-emerald-800 dark:text-emerald-300">
-                <span className="font-semibold">Smart Recommendation: </span>
+                <span className="font-semibold">{T("cmp.recommend")} </span>
                 {comparison?.recommendation}
               </p>
             </div>
@@ -405,7 +407,7 @@ export function ComparisonPanel() {
             className="mt-4 w-full flex items-center justify-center gap-1.5 h-10 rounded-xl border border-hairline bg-canvas hover:bg-surface-soft dark:hover:bg-surface-strong text-ink text-sm font-semibold transition-colors"
           >
             {showDetails ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            {showDetails ? "Hide details" : "Show side-by-side details"}
+            {showDetails ? T("cmp.hideDetails") : T("cmp.showDetails")}
           </button>
 
           {showDetails && (
@@ -430,18 +432,18 @@ export function ComparisonPanel() {
                     <div className="flex items-start justify-between gap-2">
                       <div>
                         <h4 className="text-base font-bold text-ink tracking-tight">{a.areaName}</h4>
-                        <p className="text-[11px] text-muted mt-0.5">{a.listings} listings analyzed</p>
+                        <p className="text-[11px] text-muted mt-0.5">{a.listings} {T("cmp.listingsAnalyzed")}</p>
                       </div>
                       {isBest && (
                         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 dark:bg-emerald-900/40 dark:text-emerald-400 px-2 py-0.5 rounded-full">
-                          BEST VALUE
+                          {T("cmp.bestValue")}
                         </span>
                       )}
                     </div>
 
                     {/* Big fair price */}
                     <div className="bg-surface-soft dark:bg-surface-strong rounded-lg p-3">
-                      <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">Fair Price</p>
+                      <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{T("chart.fairPrice")}</p>
                       <p className="text-2xl font-bold text-primary tabular-nums leading-none">
                         {fmt(a.fairPrice)}<span className="text-xs text-muted font-normal ml-1">/mo</span>
                       </p>
@@ -450,10 +452,10 @@ export function ComparisonPanel() {
                     {/* Stat rows */}
                     <div className="space-y-1.5">
                       {[
-                        { label: "Average rent", value: fmt(a.avgRent) },
-                        { label: "Median rent", value: fmt(a.medianRent) },
-                        { label: "Avg unit size", value: `${formatNumber(a.avgSqft)} ft²` },
-                        { label: "Price per sqft", value: fmt(a.pricePerSqft) },
+                        { label: T("kpi.avg"), value: fmt(a.avgRent) },
+                        { label: T("kpi.median"), value: fmt(a.medianRent) },
+                        { label: T("snap.avgSize"), value: `${formatNumber(a.avgSqft)} ft²` },
+                        { label: T("kpi.psf"), value: fmt(a.pricePerSqft) },
                       ].map((r) => (
                         <div key={r.label} className="flex items-center justify-between text-[12px]">
                           <span className="text-muted">{r.label}</span>
@@ -466,17 +468,17 @@ export function ComparisonPanel() {
                     <div className="flex flex-wrap gap-1 pt-2 border-t border-hairline-soft">
                       {ranks.cheapest && (
                         <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded">
-                          Most affordable
+                          {T("cmp.mostAffordable")}
                         </span>
                       )}
                       {ranks.largest && (
                         <span className="text-[10px] font-bold text-blue-700 bg-blue-50 dark:bg-blue-950/30 px-1.5 py-0.5 rounded">
-                          Largest units
+                          {T("cmp.largestUnits")}
                         </span>
                       )}
                       {ranks.mostListings && (
                         <span className="text-[10px] font-bold text-amber-700 bg-amber-50 dark:bg-amber-950/30 px-1.5 py-0.5 rounded">
-                          Most options
+                          {T("cmp.mostOptions")}
                         </span>
                       )}
                     </div>
@@ -491,13 +493,13 @@ export function ComparisonPanel() {
       {areas.length === 0 && (
         <div className="text-center py-10 text-muted">
           <GitCompare className="w-10 h-10 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Add at least 2 areas to compare</p>
+          <p className="text-sm">{T("cmp.need2")}</p>
         </div>
       )}
 
       {areas.length === 1 && (
         <div className="text-center py-6 text-muted">
-          <p className="text-sm">Add one more area to see the comparison</p>
+          <p className="text-sm">{T("cmp.need1")}</p>
         </div>
       )}
     </div>

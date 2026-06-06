@@ -9,12 +9,16 @@
 import { useState } from "react";
 import { Bell, Check, X, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 interface Props {
   area: string;
 }
 
 export function SaveAlertButton({ area }: Props) {
+  const { lang } = useAppStore();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
   const [open, setOpen] = useState(false);
   const [email, setEmail] = useState("");
   const [maxPrice, setMaxPrice] = useState("");
@@ -58,7 +62,7 @@ export function SaveAlertButton({ area }: Props) {
         title="Save search"
       >
         <Bell className="w-4 h-4" />
-        <span className="hidden xs:inline">Alert</span>
+        <span className="hidden xs:inline">{T("dash.alert")}</span>
       </button>
 
       {open && (
@@ -80,9 +84,9 @@ export function SaveAlertButton({ area }: Props) {
             <div className="p-5 md:p-6">
               <div className="flex items-start justify-between gap-3 mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-ink">Save this search</h3>
+                  <h3 className="text-lg font-bold text-ink">{T("alert.title")}</h3>
                   <p className="text-xs text-muted mt-1">
-                    Get notified about <span className="font-semibold text-ink">{area}</span>
+                    {T("alert.sub")} <span className="font-semibold text-ink">{area}</span>
                   </p>
                 </div>
                 <button
@@ -99,14 +103,14 @@ export function SaveAlertButton({ area }: Props) {
                   <div className="w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-950/40 flex items-center justify-center mx-auto mb-3">
                     <Check className="w-7 h-7 text-emerald-600 dark:text-emerald-400" />
                   </div>
-                  <p className="text-base font-bold text-ink">Saved!</p>
-                  <p className="text-xs text-muted mt-1">We&apos;ll keep an eye on it.</p>
+                  <p className="text-base font-bold text-ink">{T("alert.saved")}</p>
+                  <p className="text-xs text-muted mt-1">{T("alert.savedSub")}</p>
                 </div>
               ) : (
                 <div className="space-y-3">
                   <div>
                     <label htmlFor="alert-email" className="text-[11px] font-bold text-muted uppercase tracking-widest mb-1.5 block">
-                      Email <span className="text-muted-soft normal-case">(optional)</span>
+                      {T("alert.email")} <span className="text-muted-soft normal-case">{T("alert.optional")}</span>
                     </label>
                     <input
                       id="alert-email"
@@ -119,7 +123,7 @@ export function SaveAlertButton({ area }: Props) {
                   <div className="grid grid-cols-2 gap-2">
                     <div>
                       <label htmlFor="alert-max" className="text-[11px] font-bold text-muted uppercase tracking-widest mb-1.5 block">
-                        Max RM
+                        {T("alert.maxPrice")}
                       </label>
                       <input
                         id="alert-max"
@@ -130,7 +134,7 @@ export function SaveAlertButton({ area }: Props) {
                     </div>
                     <div>
                       <label htmlFor="alert-bed" className="text-[11px] font-bold text-muted uppercase tracking-widest mb-1.5 block">
-                        Min Bed
+                        {T("alert.minBed")}
                       </label>
                       <input
                         id="alert-bed"
@@ -150,7 +154,7 @@ export function SaveAlertButton({ area }: Props) {
                       onClick={() => setOpen(false)}
                       className="flex-1 h-10 rounded-xl border border-hairline text-ink text-sm font-semibold hover:bg-surface-soft transition-colors"
                     >
-                      Cancel
+                      {T("alert.cancel")}
                     </button>
                     <button
                       onClick={submit}
@@ -160,7 +164,7 @@ export function SaveAlertButton({ area }: Props) {
                       )}
                     >
                       {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />}
-                      {busy ? "Saving..." : "Save alert"}
+                      {busy ? T("alert.saving") : T("alert.save")}
                     </button>
                   </div>
                 </div>

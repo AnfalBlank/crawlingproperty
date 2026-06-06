@@ -86,6 +86,11 @@ export async function POST(request: NextRequest) {
         const rates = await refreshExchangeRates();
         return NextResponse.json({ success: true, rates });
       }
+      case "dispatch-alerts": {
+        const { dispatchAlerts } = await import("@/lib/services/alert-dispatcher");
+        const result = await dispatchAlerts();
+        return NextResponse.json({ success: true, result });
+      }
       case "delete-history":
         if (!body.historyId) return NextResponse.json({ error: "historyId required" }, { status: 400 });
         await deleteScanHistory(body.historyId);

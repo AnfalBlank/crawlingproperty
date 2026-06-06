@@ -5,6 +5,7 @@ import { SlidersHorizontal, X, ChevronDown, ChevronUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Furnishing } from "@/types";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 const BEDROOM_OPTIONS = ["Studio", "1", "2", "3", "4+"];
 const BATHROOM_OPTIONS = ["1", "2", "3+"];
@@ -19,8 +20,9 @@ interface FiltersPanelProps {
 }
 
 export function FiltersPanel({ onClose }: FiltersPanelProps) {
-  const { filters, setFilters, resetFilters } = useAppStore();
+  const { filters, setFilters, resetFilters, lang } = useAppStore();
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
 
   const hasActive =
     filters.bedrooms.length > 0 ||
@@ -56,7 +58,7 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SlidersHorizontal className="w-4 h-4 text-muted" />
-          <span className="text-[14px] font-semibold text-ink">Filters</span>
+          <span className="text-[14px] font-semibold text-ink">{T("filters.title")}</span>
           {hasActive && (
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse" aria-label="Active filters" />
           )}
@@ -64,7 +66,7 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
         <div className="flex items-center gap-2">
           {hasActive && (
             <button onClick={resetFilters} className="text-xs font-semibold text-primary hover:underline">
-              Reset all
+              {T("filters.reset")}
             </button>
           )}
           {onClose && (
@@ -82,13 +84,13 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
       {/* Search */}
       <div>
         <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-          Search
+          {T("filters.search")}
         </label>
         <input
           type="text"
           value={filters.search}
           onChange={(e) => setFilters({ search: e.target.value })}
-          placeholder="Property name, area..."
+          placeholder={T("filters.searchPh")}
           className={INPUT_CLS}
         />
       </div>
@@ -96,7 +98,7 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
       {/* Bedrooms */}
       <div>
         <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-          Bedrooms
+          {T("filters.bedrooms")}
         </label>
         <div className="flex flex-wrap gap-1.5">
           {BEDROOM_OPTIONS.map((opt) => (
@@ -119,7 +121,7 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
       {/* Bathrooms */}
       <div>
         <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-          Bathrooms
+          {T("filters.bathrooms")}
         </label>
         <div className="flex flex-wrap gap-1.5">
           {BATHROOM_OPTIONS.map((opt) => (
@@ -142,7 +144,7 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
       {/* Furnishing */}
       <div>
         <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-          Furnishing
+          {T("filters.furnishing")}
         </label>
         <div className="space-y-2">
           {FURNISHING_OPTIONS.map((opt) => (
@@ -167,7 +169,7 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
         className="flex items-center gap-1.5 text-[12px] font-semibold text-muted hover:text-ink transition-colors"
       >
         {showAdvanced ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-        Advanced filters
+        {T("filters.advanced")}
       </button>
 
       {/* Advanced fields */}
@@ -176,21 +178,21 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
           {/* Monthly rent */}
           <div>
             <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-              Monthly Rent (RM)
+              {T("filters.monthlyRent")}
             </label>
             <div className="flex gap-2">
               <input
                 type="number"
                 value={filters.priceMin ?? ""}
                 onChange={(e) => setFilters({ priceMin: e.target.value ? Number(e.target.value) : null })}
-                placeholder="Min"
+                placeholder={T("filters.min")}
                 className={INPUT_CLS}
               />
               <input
                 type="number"
                 value={filters.priceMax ?? ""}
                 onChange={(e) => setFilters({ priceMax: e.target.value ? Number(e.target.value) : null })}
-                placeholder="Max"
+                placeholder={T("filters.max")}
                 className={INPUT_CLS}
               />
             </div>
@@ -199,21 +201,21 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
           {/* Sqft */}
           <div>
             <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-              Sqft Range
+              {T("filters.sqftRange")}
             </label>
             <div className="flex gap-2">
               <input
                 type="number"
                 value={filters.sqftMin ?? ""}
                 onChange={(e) => setFilters({ sqftMin: e.target.value ? Number(e.target.value) : null })}
-                placeholder="Min"
+                placeholder={T("filters.min")}
                 className={INPUT_CLS}
               />
               <input
                 type="number"
                 value={filters.sqftMax ?? ""}
                 onChange={(e) => setFilters({ sqftMax: e.target.value ? Number(e.target.value) : null })}
-                placeholder="Max"
+                placeholder={T("filters.max")}
                 className={INPUT_CLS}
               />
             </div>
@@ -222,21 +224,21 @@ export function FiltersPanel({ onClose }: FiltersPanelProps) {
           {/* Price per sqft */}
           <div>
             <label className="block text-[11px] font-semibold text-muted uppercase tracking-widest mb-2">
-              Price / Sqft (RM)
+              {T("filters.psf")}
             </label>
             <div className="flex gap-2">
               <input
                 type="number"
                 value={filters.pricePerSqftMin ?? ""}
                 onChange={(e) => setFilters({ pricePerSqftMin: e.target.value ? Number(e.target.value) : null })}
-                placeholder="Min"
+                placeholder={T("filters.min")}
                 className={INPUT_CLS}
               />
               <input
                 type="number"
                 value={filters.pricePerSqftMax ?? ""}
                 onChange={(e) => setFilters({ pricePerSqftMax: e.target.value ? Number(e.target.value) : null })}
-                placeholder="Max"
+                placeholder={T("filters.max")}
                 className={INPUT_CLS}
               />
             </div>

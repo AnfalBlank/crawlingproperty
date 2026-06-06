@@ -9,6 +9,7 @@ import { TrendingUp, BedDouble, Sofa } from "lucide-react";
 import { cn, formatCurrency, toPeriod } from "@/lib/utils";
 import { PriceBucket, BedroomBucket, FurnishingBucket, PriceSummary } from "@/types";
 import { useAppStore } from "@/store/app-store";
+import { t } from "@/lib/i18n";
 
 // ─── Tooltips ─────────────────────────────────────────────────────────────────
 
@@ -74,9 +75,10 @@ export function PriceDistributionChart({
   data: PriceBucket[];
   summary?: PriceSummary;
 }) {
-  const { activePriceBucket, setActivePriceBucket, currency, getRate, rentalPeriod } = useAppStore();
+  const { activePriceBucket, setActivePriceBucket, currency, getRate, rentalPeriod, lang } = useAppStore();
   const [hover, setHover] = useState<number | null>(null);
   const rate = getRate();
+  const T = (k: Parameters<typeof t>[1]) => t(lang, k);
 
   const total = data.reduce((a, b) => a + b.count, 0);
   // Which bucket is the mode (tallest)?
@@ -97,12 +99,12 @@ export function PriceDistributionChart({
 
   return (
     <ChartCard
-      title="Price Distribution"
-      sub="Tap a bar to filter listings"
+      title={T("chart.priceDist")}
+      sub={T("chart.tapToFilter")}
       right={
         <div className="flex items-center gap-1 text-[11px] font-semibold text-muted bg-surface-soft dark:bg-surface-strong px-2.5 py-1 rounded-full">
           <TrendingUp className="w-3 h-3 text-primary" />
-          {total} units
+          {total} {T("chart.units")}
         </div>
       }
     >
@@ -155,7 +157,7 @@ export function PriceDistributionChart({
                 stroke="#3b82f6"
                 strokeDasharray="4 3"
                 strokeWidth={1.5}
-                label={{ value: "Median", position: "top", fontSize: 9, fill: "#3b82f6", fontWeight: 700 }}
+                label={{ value: T("chart.median"), position: "top", fontSize: 9, fill: "#3b82f6", fontWeight: 700 }}
               />
             )}
             {fairIdx >= 0 && fairIdx !== medianIdx && (
@@ -164,7 +166,7 @@ export function PriceDistributionChart({
                 stroke="#10b981"
                 strokeDasharray="4 3"
                 strokeWidth={1.5}
-                label={{ value: "Fair", position: "top", fontSize: 9, fill: "#10b981", fontWeight: 700 }}
+                label={{ value: T("calc.fair"), position: "top", fontSize: 9, fill: "#10b981", fontWeight: 700 }}
               />
             )}
 
@@ -223,9 +225,9 @@ export function PriceDistributionChart({
       {summary && (
         <div className="grid grid-cols-3 gap-2 mt-3 shrink-0">
           {[
-            { label: "Average", value: toPeriod(summary.avgPrice, rentalPeriod), color: "text-ink" },
-            { label: "Median", value: toPeriod(summary.medianPrice, rentalPeriod), color: "text-blue-600 dark:text-blue-400" },
-            { label: "Fair Price", value: toPeriod(summary.fairPrice, rentalPeriod), color: "text-emerald-600 dark:text-emerald-400" },
+            { label: T("chart.average"), value: toPeriod(summary.avgPrice, rentalPeriod), color: "text-ink" },
+            { label: T("chart.median"), value: toPeriod(summary.medianPrice, rentalPeriod), color: "text-blue-600 dark:text-blue-400" },
+            { label: T("chart.fairPrice"), value: toPeriod(summary.fairPrice, rentalPeriod), color: "text-emerald-600 dark:text-emerald-400" },
           ].map((s) => (
             <div key={s.label} className="bg-surface-soft dark:bg-surface-strong rounded-lg px-2 py-1.5 text-center">
               <p className="text-[9px] font-bold text-muted uppercase tracking-wider">{s.label}</p>
@@ -240,13 +242,13 @@ export function PriceDistributionChart({
       {activePriceBucket && (
         <div className="mt-2.5 flex items-center justify-between bg-primary/8 border border-primary/15 rounded-xl px-3 py-2 shrink-0 animate-fade-in-up">
           <span className="text-[12px] text-muted">
-            Filtering: <span className="font-bold text-primary">{activePriceBucket}</span>
+            {T("filters.title")}: <span className="font-bold text-primary">{activePriceBucket}</span>
           </span>
           <button
             onClick={() => setActivePriceBucket(null)}
             className="text-[11px] font-bold text-primary hover:underline"
           >
-            Clear
+            {T("filters.reset")}
           </button>
         </div>
       )}
@@ -347,28 +349,30 @@ function DonutChart({
 }
 
 export function BedroomDistributionChart({ data }: { data: BedroomBucket[] }) {
+  const { lang } = useAppStore();
   return (
     <ChartCard
-      title="Bedroom Types"
-      sub="Unit type breakdown"
+      title={t(lang, "chart.bedroomTypes")}
+      sub={t(lang, "chart.units")}
       right={<BedDouble className="w-4 h-4 text-muted" />}
     >
       <div className="flex-1 flex items-center">
-        <DonutChart data={data} colors={BEDROOM_COLORS} centerLabel="units" />
+        <DonutChart data={data} colors={BEDROOM_COLORS} centerLabel={t(lang, "chart.units")} />
       </div>
     </ChartCard>
   );
 }
 
 export function FurnishingDistributionChart({ data }: { data: FurnishingBucket[] }) {
+  const { lang } = useAppStore();
   return (
     <ChartCard
-      title="Furnishing"
-      sub="Furnishing status breakdown"
+      title={t(lang, "chart.furnishing")}
+      sub={t(lang, "chart.units")}
       right={<Sofa className="w-4 h-4 text-muted" />}
     >
       <div className="flex-1 flex items-center">
-        <DonutChart data={data} colors={FURNISH_COLORS} centerLabel="units" />
+        <DonutChart data={data} colors={FURNISH_COLORS} centerLabel={t(lang, "chart.units")} />
       </div>
     </ChartCard>
   );

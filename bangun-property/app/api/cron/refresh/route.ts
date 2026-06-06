@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { enqueueAnalysis } from "@/lib/services/job-queue";
 import { refreshExchangeRates } from "@/lib/services/exchange-rates";
+import { dispatchAlerts } from "@/lib/services/alert-dispatcher";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -18,6 +19,7 @@ const POPULAR_AREAS = [
  *
  * 1. Refreshes exchange rates from Frankfurter.
  * 2. Force-enqueues a re-crawl for every popular area (queue handles concurrency).
+ * 3. Dispatches saved-search email alerts (Point 6).
  */
 export async function GET(request: NextRequest) {
   const secret = process.env.CRON_SECRET;
@@ -35,10 +37,18 @@ export async function GET(request: NextRequest) {
       enqueueAnalysis(area, { force: true });
       enqueued.push(area);
     }
+
+    // Give the queue a head start so freshly-crawled listings are available
+    // to the alert matcher. We don't block on full completion (60s ceiling) —
+    // alerts run against whatever is currently in the DB (yesterday's + any
+    // already-finished crawls). Next run catches the rest.
+    const alerts = await dispatchAlerts();
+
     return NextResponse.json({
       ok: true,
       ratesRefreshed: true,
       areasEnqueued: enqueued,
+      alerts,
       enqueuedAt: new Date().toISOString(),
     });
   } catch (e) {

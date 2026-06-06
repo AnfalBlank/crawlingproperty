@@ -10,6 +10,7 @@ import { useState } from "react";
 import { Share2, Check } from "lucide-react";
 import { useAppStore } from "@/store/app-store";
 import { buildShareUrl } from "@/lib/utils";
+import { t } from "@/lib/i18n";
 
 interface Props {
   area: string;
@@ -17,7 +18,7 @@ interface Props {
 }
 
 export function ShareButton({ area, withCompare }: Props) {
-  const { currency, rentalPeriod } = useAppStore();
+  const { currency, rentalPeriod, lang } = useAppStore();
   const [copied, setCopied] = useState(false);
 
   const handle = async () => {
@@ -48,7 +49,7 @@ export function ShareButton({ area, withCompare }: Props) {
       title="Copy shareable link"
     >
       {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Share2 className="w-4 h-4" />}
-      <span className="hidden xs:inline">{copied ? "Copied" : "Share"}</span>
+      <span className="hidden xs:inline">{copied ? t(lang, "dash.shared") : t(lang, "dash.share")}</span>
     </button>
   );
 }
