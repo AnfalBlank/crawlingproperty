@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Plus, X, Save, Trash2, GitCompare, Star, ChevronDown, ChevronUp } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import { Plus, X, Save, Trash2, GitCompare, Star, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import {
   BarChart,
   Bar,
@@ -31,9 +31,29 @@ export function ComparisonPanel() {
   const [showSave, setShowSave] = useState(false);
   const [showSaved, setShowSaved] = useState(false);
   const [showDetails, setShowDetails] = useState(false);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const inputWrapRef = useRef<HTMLDivElement>(null);
+
+  // Close suggestions on outside click
+  useEffect(() => {
+    const handler = (e: MouseEvent) => {
+      if (inputWrapRef.current && !inputWrapRef.current.contains(e.target as Node)) {
+        setShowSuggestions(false);
+      }
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   const areas = comparison?.areas ?? [];
   const canAdd = areas.length < 5;
+
+  // Areas already added (to filter out of suggestions)
+  const addedNames = new Set(areas.map((a) => a.areaName.toLowerCase()));
+  const filteredSuggestions = POPULAR_AREAS.filter(
+    (a) => !addedNames.has(a.toLowerCase()) &&
+           a.toLowerCase().includes(areaInput.trim().toLowerCase())
+  );
 
   const addArea = async () => {
     const input = areaInput.trim();
@@ -65,6 +85,7 @@ export function ComparisonPanel() {
       const newAreas = [...areas, item];
       setComparison({ areas: newAreas, recommendation: generateRecommendation(newAreas, lang) });
       setAreaInput("");
+      setShowSuggestions(false);
     } catch (e) {
       setError(e instanceof Error ? e.message : T("cmp.addFailed"));
     } finally {
@@ -247,24 +268,61 @@ export function ComparisonPanel() {
 
       {/* Add Area */}
       <div className="flex gap-2 mb-5">
-        <div className="relative flex-1">
+        <div ref={inputWrapRef} className="relative flex-1">
           <input
             value={areaInput}
-            onChange={(e) => setAreaInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && addArea()}
+            onChange={(e) => { setAreaInput(e.target.value); setShowSuggestions(true); }}
+            onFocus={() => setShowSuggestions(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") { addArea(); }
+              if (e.key === "Escape") setShowSuggestions(false);
+            }}
             placeholder={T("cmp.addPh")}
             disabled={!canAdd}
-            list="comparison-areas"
             className={cn(
-              "w-full h-10 px-3 border border-hairline rounded-lg text-sm focus:outline-none focus:border-border-strong bg-canvas dark:bg-canvas text-ink transition-colors",
+              "w-full h-10 pl-3 pr-9 border border-hairline rounded-lg text-sm focus:outline-none focus:border-border-strong bg-canvas dark:bg-canvas text-ink transition-colors",
               !canAdd && "opacity-50 cursor-not-allowed"
             )}
+            aria-label={T("cmp.addPh")}
+            aria-expanded={showSuggestions}
+            role="combobox"
+            aria-controls="cmp-suggestions"
           />
-          <datalist id="comparison-areas">
-            {POPULAR_AREAS.map((a) => (
-              <option key={a} value={a} />
-            ))}
-          </datalist>
+          <ChevronDown
+            className={cn(
+              "absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted pointer-events-none transition-transform",
+              showSuggestions && "rotate-180"
+            )}
+          />
+
+          {/* Custom suggestions dropdown — consistent with other dropdowns */}
+          {showSuggestions && canAdd && filteredSuggestions.length > 0 && (
+            <div
+              id="cmp-suggestions"
+              className="absolute left-0 right-0 top-full mt-2 z-50 bg-canvas dark:bg-canvas border border-hairline rounded-xl shadow-lifted overflow-hidden origin-top"
+              style={{ animation: "dropdown-in 0.22s cubic-bezier(0.16,1,0.3,1)" }}
+              role="listbox"
+            >
+              <div className="py-1 max-h-60 overflow-y-auto">
+                {filteredSuggestions.map((a, i) => (
+                  <button
+                    key={a}
+                    role="option"
+                    aria-selected={false}
+                    onClick={() => { setAreaInput(a); setShowSuggestions(false); }}
+                    className="w-full flex items-center gap-3 px-3 py-2.5 text-left transition-colors hover:bg-surface-soft dark:hover:bg-surface-strong group"
+                    style={{ animation: `dropdown-item 0.3s cubic-bezier(0.16,1,0.3,1) ${i * 35}ms both` }}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center shrink-0 group-hover:scale-105 transition-transform">
+                      <MapPin className="w-4 h-4 text-primary" />
+                    </div>
+                    <span className="text-[14px] font-medium text-ink truncate flex-1">{a}</span>
+                    <span className="text-muted-soft group-hover:text-primary group-hover:translate-x-0.5 transition-all text-base shrink-0">→</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
         <button
           onClick={addArea}
