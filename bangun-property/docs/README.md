@@ -4,7 +4,8 @@ Three documents that together cover everything about the project:
 
 | Doc | Audience | Length |
 |---|---|---|
-| [`MANUAL.md`](./MANUAL.md) | End users — how to use the product | ~17 sections |
+| [`PANDUAN_SINGKAT.md`](./PANDUAN_SINGKAT.md) | Ringkasan (Bahasa Indonesia) — apa, cara pakai, fitur | 7 bagian |
+| [`MANUAL.md`](./MANUAL.md) | End users — how to use the product | ~18 sections |
 | [`TECHNICAL.md`](./TECHNICAL.md) | Engineers — architecture, API, deploy | ~20 sections |
 | [`PITCH_DECK.md`](./PITCH_DECK.md) | Stakeholders — vision, status, roadmap | 17 slides |
 

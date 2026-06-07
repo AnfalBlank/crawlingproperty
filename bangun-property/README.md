@@ -30,6 +30,7 @@ All powered by live SPEEDHOME data, cached for 24 h, refreshed daily by cron.
 
 | Doc | What it's for |
 |---|---|
+| [`docs/PANDUAN_SINGKAT.md`](./docs/PANDUAN_SINGKAT.md) | Ringkasan Bahasa Indonesia — apa, cara pakai, fitur |
 | [`docs/MANUAL.md`](./docs/MANUAL.md) | End-user guide — every feature, every flow |
 | [`docs/TECHNICAL.md`](./docs/TECHNICAL.md) | Architecture, data model, API reference, deploy |
 | [`docs/PITCH_DECK.md`](./docs/PITCH_DECK.md) | Slide deck — vision, status, roadmap |
