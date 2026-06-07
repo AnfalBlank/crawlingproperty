@@ -2,10 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense } from "react";
 import { MapPin, Mail, ArrowUpRight, Globe } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 import { t } from "@/lib/i18n";
 
@@ -27,24 +24,12 @@ const POPULAR_AREAS = [
 ];
 
 const SYSTEM = [
-  { label: "Admin Dashboard", href: "/admin" },
-  { label: "Crawl Monitor",   href: "/admin?tab=monitor" },
-  { label: "Cache Manager",   href: "/admin?tab=cache" },
-  { label: "Exchange Rates",  href: "/admin?tab=rates" },
+  { label: "About", href: "/" },
+  { label: "Documentation", href: "https://github.com/AnfalBlank/crawlingproperty" },
 ];
 
 export function Footer() {
-  return (
-    <Suspense fallback={null}>
-      <FooterInner />
-    </Suspense>
-  );
-}
-
-function FooterInner() {
   const { lang } = useAppStore();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const year = new Date().getFullYear();
 
   return (
@@ -132,42 +117,31 @@ function FooterInner() {
             </ul>
           </div>
 
-          {/* ── System ──────────────────────────────────────────────────── */}
+          {/* ── Resources ─────────────────────────────────────────────── */}
           <div className="md:col-span-3">
             <h3 className="text-[10.5px] font-bold text-ink uppercase tracking-[0.18em] mb-4">
-              System
+              Resources
             </h3>
             <ul className="space-y-2.5">
-              {SYSTEM.map(({ label, href }) => {
-                // Only mark active when current URL matches the exact href (incl. ?tab=)
-                // — prevents all four System links from highlighting at once on /admin.
-                const [hrefPath, hrefQuery] = href.split("?");
-                const currentTab = searchParams.get("tab");
-                const targetTab = hrefQuery ? new URLSearchParams(hrefQuery).get("tab") : null;
-                const active =
-                  pathname === hrefPath &&
-                  (targetTab ? currentTab === targetTab : !currentTab);
-                return (
+              {SYSTEM.map(({ label, href }) => (
                   <li key={label}>
                     <Link
                       href={href}
-                      className={cn(
-                        "text-[13px] inline-flex items-center gap-1 group transition-colors",
-                        active ? "text-primary font-semibold" : "text-muted hover:text-primary"
-                      )}
+                      className="text-[13px] inline-flex items-center gap-1 group transition-colors text-muted hover:text-primary"
+                      {...(href.startsWith("http") ? { target: "_blank", rel: "noopener noreferrer" } : {})}
                     >
                       <span className="group-hover:translate-x-0.5 transition-transform">{label}</span>
+                      {href.startsWith("http") && <ArrowUpRight className="w-3 h-3" />}
                     </Link>
                   </li>
-                );
-              })}
+              ))}
             </ul>
 
             <Link
               href="/analysis"
               className="mt-6 inline-flex items-center gap-1.5 text-[13px] font-bold text-ink hover:text-primary transition-colors group"
             >
-              Open dashboard
+              Start analyzing
               <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
             </Link>
           </div>

@@ -51,7 +51,6 @@ export function Navbar() {
   const NAV_LINKS = [
     { href: "/",         label: t(lang, "nav.home")     },
     { href: "/analysis", label: t(lang, "nav.analysis") },
-    { href: "/admin",    label: t(lang, "nav.admin")    },
   ];
 
   const currentLang = LANGUAGES.find((l) => l.code === lang)!;
