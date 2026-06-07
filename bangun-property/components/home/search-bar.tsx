@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 import { Search, MapPin, Link2, X, Clock, TrendingUp } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -21,7 +22,21 @@ export function SearchBar({ className, autoFocus = false, size = "lg" }: SearchB
   const [activeTab, setActiveTab] = useState<"area" | "url">("area");
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const pillRef = useRef<HTMLDivElement>(null);
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([]);
+  const [mounted, setMounted] = useState(false);
+
+  // Portal target only available client-side
+  useEffect(() => { setMounted(true); }, []);
+
+  // Position of the dropdown — tracks the pill input so the portal renders in place
+  const [pos, setPos] = useState<{ left: number; top: number; width: number } | null>(null);
+
+  const updatePos = useCallback(() => {
+    if (!pillRef.current) return;
+    const r = pillRef.current.getBoundingClientRect();
+    setPos({ left: r.left, top: r.bottom + 8, width: r.width });
+  }, []);
 
   // Real autocomplete via /api/search — 250ms debounce (PRD §9)
   useEffect(() => {
@@ -43,9 +58,12 @@ export function SearchBar({ className, autoFocus = false, size = "lg" }: SearchB
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setFocused(false);
-      }
+      const target = e.target as Node;
+      // Keep open if click is inside the input container OR the portal dropdown
+      if (containerRef.current?.contains(target)) return;
+      const dd = document.getElementById("searchbar-dropdown");
+      if (dd?.contains(target)) return;
+      setFocused(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -61,6 +79,19 @@ export function SearchBar({ className, autoFocus = false, size = "lg" }: SearchB
 
   const showDropdown = focused && (query.length > 0 || recentSearches.length > 0);
   const isLg = size === "lg";
+
+  // Recompute position whenever the dropdown opens, and on scroll/resize
+  useEffect(() => {
+    if (!showDropdown) return;
+    updatePos();
+    const onScroll = () => updatePos();
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, [showDropdown, updatePos]);
 
   return (
     <div ref={containerRef} className={cn("relative w-full", className)}>
@@ -97,6 +128,7 @@ export function SearchBar({ className, autoFocus = false, size = "lg" }: SearchB
 
       {/* Pill input */}
       <div
+        ref={pillRef}
         className={cn(
           "flex items-center bg-canvas dark:bg-canvas rounded-full border-2 transition-all duration-200",
           focused
@@ -156,11 +188,19 @@ export function SearchBar({ className, autoFocus = false, size = "lg" }: SearchB
         </button>
       </div>
 
-      {/* Dropdown */}
-      {showDropdown && (
+      {/* Dropdown — rendered via portal to <body> so it escapes the hero's
+          overflow-hidden clipping and floats above all hero layers. */}
+      {mounted && showDropdown && pos && createPortal(
         <div
-          className="absolute left-0 right-0 top-full mt-2 bg-canvas dark:bg-canvas border border-hairline rounded-2xl shadow-lifted z-50 overflow-hidden max-h-[60vh] overflow-y-auto origin-top"
-          style={{ animation: "dropdown-in 0.28s cubic-bezier(0.16,1,0.3,1)" }}
+          id="searchbar-dropdown"
+          className="fixed bg-canvas dark:bg-canvas border border-hairline rounded-2xl shadow-lifted overflow-hidden max-h-[55vh] overflow-y-auto origin-top"
+          style={{
+            left: pos.left,
+            top: pos.top,
+            width: pos.width,
+            zIndex: 2147483600,
+            animation: "dropdown-in 0.28s cubic-bezier(0.16,1,0.3,1)",
+          }}
           role="listbox"
         >
           {!query && recentSearches.length > 0 && (
@@ -229,19 +269,9 @@ export function SearchBar({ className, autoFocus = false, size = "lg" }: SearchB
               </button>
             </div>
           )}
-        </div>
+        </div>,
+        document.body
       )}
-
-      <style jsx>{`
-        @keyframes dropdown-in {
-          from { opacity: 0; transform: translateY(-8px) scaleY(0.96); }
-          to { opacity: 1; transform: translateY(0) scaleY(1); }
-        }
-        @keyframes dropdown-item {
-          from { opacity: 0; transform: translateX(-10px); }
-          to { opacity: 1; transform: translateX(0); }
-        }
-      `}</style>
     </div>
   );
 }
