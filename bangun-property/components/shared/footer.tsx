@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
-import { MapPin, Mail, ArrowUpRight } from "lucide-react";
+import { MapPin, Mail, ArrowUpRight, Globe } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAppStore } from "@/store/app-store";
 import { t } from "@/lib/i18n";
@@ -176,12 +176,25 @@ function FooterInner() {
 
       {/* ── Legal band ──────────────────────────────────────────────────── */}
       <div className="border-t border-hairline-soft">
-        <div className="max-w-[1440px] mx-auto px-5 md:px-8 lg:px-10 py-5 flex flex-col-reverse sm:flex-row items-start sm:items-center justify-between gap-3">
+        <div className="max-w-[1440px] mx-auto px-5 md:px-8 lg:px-10 py-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-[12px] text-muted">
             © {year} Estate Insight. Data sourced from SPEEDHOME public listings.
           </p>
-          <div className="flex items-center gap-4 text-[12px] text-muted">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4 text-[12px] text-muted">
             <span>Not affiliated with SPEEDHOME Sdn. Bhd.</span>
+            <span className="hidden sm:inline text-hairline">·</span>
+            <a
+              href="https://www.anfalhidayat.web.id"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 font-medium text-muted hover:text-primary transition-colors group w-fit"
+            >
+              <Globe className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                Made by <span className="font-semibold text-ink group-hover:text-primary transition-colors">Anfal Hidayat</span>
+              </span>
+              <ArrowUpRight className="w-3 h-3 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+            </a>
           </div>
         </div>
       </div>
