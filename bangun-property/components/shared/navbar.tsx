@@ -246,7 +246,7 @@ export function Navbar() {
                   Currency
                 </p>
                 <div className="px-1 mb-4">
-                  <CurrencySelector className="w-full" />
+                  <CurrencySelector className="w-full" fullWidth />
                 </div>
 
                 <p className="px-4 mb-2 text-[10px] font-bold text-muted uppercase tracking-widest">
