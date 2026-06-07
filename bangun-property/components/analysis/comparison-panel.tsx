@@ -59,14 +59,14 @@ export function ComparisonPanel() {
         pricePerSqft: analysis.summary.avgPricePerSqft,
       };
       if (areas.some((a) => a.areaName.toLowerCase() === item.areaName.toLowerCase())) {
-        setError(`${item.areaName} is already in comparison`);
+        setError(`${item.areaName} ${T("cmp.alreadyAdded")}`);
         return;
       }
       const newAreas = [...areas, item];
-      setComparison({ areas: newAreas, recommendation: generateRecommendation(newAreas) });
+      setComparison({ areas: newAreas, recommendation: generateRecommendation(newAreas, lang) });
       setAreaInput("");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Failed to add area");
+      setError(e instanceof Error ? e.message : T("cmp.addFailed"));
     } finally {
       setLoading(false);
       setLoadingStage("");
@@ -97,7 +97,7 @@ export function ComparisonPanel() {
   // Async crawl via job queue + polling (PRD §10)
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   async function runAsyncJob(input: string): Promise<any> {
-    setLoadingStage("Queueing crawl...");
+    setLoadingStage(T("cmp.queueing"));
     const enq = await fetch("/api/jobs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -138,7 +138,7 @@ export function ComparisonPanel() {
 
   const removeArea = (name: string) => {
     const newAreas = areas.filter((a) => a.areaName !== name);
-    setComparison(newAreas.length ? { areas: newAreas, recommendation: generateRecommendation(newAreas) } : null);
+    setComparison(newAreas.length ? { areas: newAreas, recommendation: generateRecommendation(newAreas, lang) } : null);
   };
 
   const handleSave = () => {
@@ -150,11 +150,16 @@ export function ComparisonPanel() {
 
   const fmt = (n: number) => formatCurrency(n, currency, rate);
 
+  // Translated series labels for the chart legend
+  const kAvg = T("chart.average");
+  const kMedian = T("chart.median");
+  const kFair = T("chart.fairPrice");
+
   const chartData = areas.map((a) => ({
     name: a.areaName,
-    "Avg Rent": Math.round(a.avgRent * rate),
-    "Median Rent": Math.round(a.medianRent * rate),
-    "Fair Price": Math.round(a.fairPrice * rate),
+    [kAvg]: Math.round(a.avgRent * rate),
+    [kMedian]: Math.round(a.medianRent * rate),
+    [kFair]: Math.round(a.fairPrice * rate),
   }));
 
   const bestValue = areas.length >= 2
@@ -166,8 +171,8 @@ export function ComparisonPanel() {
       {/* Header */}
       <div className="flex items-center justify-between mb-5">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-md bg-blue-50 flex items-center justify-center">
-            <GitCompare className="w-4 h-4 text-blue-600" />
+          <div className="w-8 h-8 rounded-md bg-blue-50 dark:bg-blue-950/40 flex items-center justify-center">
+            <GitCompare className="w-4 h-4 text-blue-600 dark:text-blue-400" />
           </div>
           <div>
             <h3 className="text-[15px] font-semibold text-ink">{T("cmp.title")}</h3>
@@ -203,16 +208,16 @@ export function ComparisonPanel() {
           <input
             value={saveName}
             onChange={(e) => setSaveName(e.target.value)}
-            placeholder="e.g. Mont Kiara vs KLCC"
+            placeholder={T("cmp.savePh")}
             className="flex-1 h-9 px-3 border border-hairline rounded-lg text-sm focus:outline-none focus:border-border-strong bg-canvas dark:bg-canvas text-ink"
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
           />
           <button
             onClick={handleSave}
             disabled={!saveName.trim()}
-            className="px-3 h-9 bg-primary text-white rounded-sm text-sm font-medium disabled:opacity-50"
+            className="px-4 h-9 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary-active disabled:opacity-50 transition-colors shrink-0"
           >
-            Save
+            {T("cmp.save")}
           </button>
         </div>
       )}
@@ -220,7 +225,7 @@ export function ComparisonPanel() {
       {/* Saved Comparisons */}
       {showSaved && savedComparisons.length > 0 && (
         <div className="mb-4 p-3 bg-surface-soft dark:bg-surface-strong rounded-xl space-y-2">
-          <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Saved Comparisons</p>
+          <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">{T("cmp.savedTitle")}</p>
           {savedComparisons.map((sc) => (
             <div key={sc.name} className="flex items-center justify-between">
               <button
@@ -297,7 +302,7 @@ export function ComparisonPanel() {
           {areas.map((a) => (
             <div
               key={a.areaName}
-              className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-soft rounded-full text-sm border border-hairline"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-surface-soft dark:bg-surface-strong rounded-full text-sm border border-hairline"
             >
               <span className="text-ink font-medium">{a.areaName}</span>
               <button
@@ -319,7 +324,7 @@ export function ComparisonPanel() {
             <table className="w-full text-sm min-w-[560px]" aria-label="Area comparison table">
               <thead>
                 <tr className="border-b border-hairline bg-surface-soft/50 dark:bg-surface-strong/50">
-                  {["Area", "Listings", "Avg Rent", "Median", "Fair Price", "Avg Sqft", "Price/Sqft"].map((h) => (
+                  {[T("cmp.colArea"), T("cmp.colListings"), T("cmp.colAvg"), T("cmp.colMedian"), T("cmp.colFair"), T("cmp.colSqft"), T("cmp.colPsf")].map((h) => (
                     <th key={h} className="px-3 py-2.5 text-left text-[11px] font-semibold text-muted uppercase tracking-wide whitespace-nowrap">
                       {h}
                     </th>
@@ -340,7 +345,7 @@ export function ComparisonPanel() {
                         {fmt(a.pricePerSqft)}
                         {bestValue?.areaName === a.areaName && (
                           <span className="ml-1.5 text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase bg-emerald-50 dark:bg-emerald-950/40 px-1.5 py-0.5 rounded-full">
-                            Best
+                            {T("cmp.best")}
                           </span>
                         )}
                       </span>
@@ -380,9 +385,9 @@ export function ComparisonPanel() {
                 }}
               />
               <Legend iconType="circle" iconSize={9} formatter={(v) => <span style={{ fontSize: 12, color: "var(--color-muted)" }}>{v}</span>} />
-              <Bar dataKey="Avg Rent" fill="url(#cmpAvg)" radius={[4, 4, 0, 0]} animationDuration={700} />
-              <Bar dataKey="Median Rent" fill="url(#cmpMedian)" radius={[4, 4, 0, 0]} animationDuration={700} />
-              <Bar dataKey="Fair Price" fill="url(#cmpFair)" radius={[4, 4, 0, 0]} animationDuration={700} />
+              <Bar dataKey={kAvg} fill="url(#cmpAvg)" radius={[4, 4, 0, 0]} animationDuration={700} />
+              <Bar dataKey={kMedian} fill="url(#cmpMedian)" radius={[4, 4, 0, 0]} animationDuration={700} />
+              <Bar dataKey={kFair} fill="url(#cmpFair)" radius={[4, 4, 0, 0]} animationDuration={700} />
             </BarChart>
           </ResponsiveContainer>
 
@@ -445,7 +450,7 @@ export function ComparisonPanel() {
                     <div className="bg-surface-soft dark:bg-surface-strong rounded-lg p-3">
                       <p className="text-[10px] font-bold text-muted uppercase tracking-widest mb-1">{T("chart.fairPrice")}</p>
                       <p className="text-2xl font-bold text-primary tabular-nums leading-none">
-                        {fmt(a.fairPrice)}<span className="text-xs text-muted font-normal ml-1">/mo</span>
+                        {fmt(a.fairPrice)}<span className="text-xs text-muted font-normal ml-1">{T("kpi.perMonth")}</span>
                       </p>
                     </div>
 
@@ -506,8 +511,18 @@ export function ComparisonPanel() {
   );
 }
 
-function generateRecommendation(areas: AreaComparisonItem[]): string {
+function generateRecommendation(areas: AreaComparisonItem[], lang: Parameters<typeof t>[0]): string {
   if (areas.length < 2) return "";
   const best = areas.reduce((prev, curr) => curr.pricePerSqft < prev.pricePerSqft ? curr : prev);
-  return `${best.areaName} provides the best value among selected areas due to the lowest price per sqft (${formatCurrency(best.pricePerSqft, "MYR", 1)}/sqft).`;
+  const psf = formatCurrency(best.pricePerSqft, "MYR", 1);
+  switch (lang) {
+    case "ms":
+      return `${best.areaName} menawarkan nilai terbaik antara kawasan yang dipilih kerana harga per kaki persegi terendah (${psf}/kaki²).`;
+    case "id":
+      return `${best.areaName} menawarkan nilai terbaik di antara area terpilih karena harga per sqft terendah (${psf}/sqft).`;
+    case "zh":
+      return `${best.areaName} 在所选区域中性价比最高，每平方英尺价格最低（${psf}/平方英尺）。`;
+    default:
+      return `${best.areaName} provides the best value among selected areas due to the lowest price per sqft (${psf}/sqft).`;
+  }
 }

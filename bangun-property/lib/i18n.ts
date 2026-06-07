@@ -77,6 +77,9 @@ type TranslationKey =
   | "cmp.area" | "cmp.best" | "cmp.recommend" | "cmp.showDetails" | "cmp.hideDetails"
   | "cmp.bestValue" | "cmp.mostAffordable" | "cmp.largestUnits" | "cmp.mostOptions"
   | "cmp.need2" | "cmp.need1" | "cmp.listingsAnalyzed"
+  | "cmp.savedTitle" | "cmp.savePh" | "cmp.colArea" | "cmp.colListings" | "cmp.colAvg"
+  | "cmp.colMedian" | "cmp.colFair" | "cmp.colSqft" | "cmp.colPsf"
+  | "cmp.alreadyAdded" | "cmp.addFailed" | "cmp.queueing"
   // ── Recent searches ──
   | "recent.title" | "recent.clear" | "recent.listings"
   // ── Errors ──
@@ -200,6 +203,10 @@ const EN: Translations = {
   "cmp.largestUnits": "Largest units", "cmp.mostOptions": "Most options",
   "cmp.need2": "Add at least 2 areas to compare", "cmp.need1": "Add one more area to see the comparison",
   "cmp.listingsAnalyzed": "listings analyzed",
+  "cmp.savedTitle": "Saved Comparisons", "cmp.savePh": "e.g. Mont Kiara vs KLCC",
+  "cmp.colArea": "Area", "cmp.colListings": "Listings", "cmp.colAvg": "Avg Rent",
+  "cmp.colMedian": "Median", "cmp.colFair": "Fair Price", "cmp.colSqft": "Avg Sqft", "cmp.colPsf": "Price/Sqft",
+  "cmp.alreadyAdded": "is already in comparison", "cmp.addFailed": "Failed to add area", "cmp.queueing": "Queueing crawl...",
   // Recent
   "recent.title": "Recent Searches", "recent.clear": "Clear all", "recent.listings": "listings",
   // Errors
@@ -323,6 +330,10 @@ const MS: Translations = {
   "cmp.largestUnits": "Unit terbesar", "cmp.mostOptions": "Paling banyak pilihan",
   "cmp.need2": "Tambah sekurang-kurangnya 2 kawasan untuk membandingkan", "cmp.need1": "Tambah satu lagi kawasan untuk melihat perbandingan",
   "cmp.listingsAnalyzed": "senarai dianalisis",
+  "cmp.savedTitle": "Perbandingan Disimpan", "cmp.savePh": "cth. Mont Kiara vs KLCC",
+  "cmp.colArea": "Kawasan", "cmp.colListings": "Senarai", "cmp.colAvg": "Sewa Purata",
+  "cmp.colMedian": "Median", "cmp.colFair": "Harga Wajar", "cmp.colSqft": "Purata Kaki²", "cmp.colPsf": "Harga/Kaki²",
+  "cmp.alreadyAdded": "sudah ada dalam perbandingan", "cmp.addFailed": "Gagal menambah kawasan", "cmp.queueing": "Mengantri crawl...",
   // Recent
   "recent.title": "Carian Terkini", "recent.clear": "Kosongkan semua", "recent.listings": "senarai",
   // Errors
@@ -446,6 +457,10 @@ const ID: Translations = {
   "cmp.largestUnits": "Unit terbesar", "cmp.mostOptions": "Paling banyak pilihan",
   "cmp.need2": "Tambah minimal 2 area untuk membandingkan", "cmp.need1": "Tambah satu area lagi untuk melihat perbandingan",
   "cmp.listingsAnalyzed": "listing dianalisis",
+  "cmp.savedTitle": "Perbandingan Tersimpan", "cmp.savePh": "mis. Mont Kiara vs KLCC",
+  "cmp.colArea": "Area", "cmp.colListings": "Listing", "cmp.colAvg": "Sewa Rata-rata",
+  "cmp.colMedian": "Median", "cmp.colFair": "Harga Wajar", "cmp.colSqft": "Rata-rata Sqft", "cmp.colPsf": "Harga/Sqft",
+  "cmp.alreadyAdded": "sudah ada di perbandingan", "cmp.addFailed": "Gagal menambah area", "cmp.queueing": "Mengantre crawl...",
   // Recent
   "recent.title": "Pencarian Terkini", "recent.clear": "Hapus semua", "recent.listings": "listing",
   // Errors
@@ -569,6 +584,10 @@ const ZH: Translations = {
   "cmp.largestUnits": "最大单位", "cmp.mostOptions": "最多选择",
   "cmp.need2": "添加至少2个区域进行比较", "cmp.need1": "再添加一个区域查看比较",
   "cmp.listingsAnalyzed": "已分析房源",
+  "cmp.savedTitle": "已保存的比较", "cmp.savePh": "例如 Mont Kiara vs KLCC",
+  "cmp.colArea": "区域", "cmp.colListings": "房源", "cmp.colAvg": "平均租金",
+  "cmp.colMedian": "中位数", "cmp.colFair": "公平价格", "cmp.colSqft": "平均面积", "cmp.colPsf": "每平方英尺",
+  "cmp.alreadyAdded": "已在比较中", "cmp.addFailed": "添加区域失败", "cmp.queueing": "正在排队爬取...",
   // Recent
   "recent.title": "最近搜索", "recent.clear": "清除全部", "recent.listings": "房源",
   // Errors
